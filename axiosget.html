@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+</head>
+<body style="text-align: center;">
+    <div class="container">
+        <div class="row-md-12">
+            <p style="color: coral; font-size: 30px;">Book a call</p>
+            <form action="" id="form" onsubmit="q(event)" style="background-color: antiquewhite; padding: 10px;">
+                
+                    Expense Amount: <input type="text" id="amount" name="fname"><br><br>
+                
+                    Description: <input type="email" id="description" name="email"><br><br>
+                
+                    Choose a Category: <select name="category" id="category">
+                        <option value="movie">Movie</option>
+                        <option value="fuel-diesel ">Fuel-Diesel </option>
+                        <option value="fuel-petrol">Fuel-Petrol</option>
+                        <option value="vacation">Vacation</option>
+                        <option value="food">Food</option>
+                    </select><br><br>
+                
+                
+                <input type="submit" value="Add Expense">
+            </form>
+            <ul id="ulul" style="list-style: none;">
+                
+            </ul>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+function q(event) {
+    event.preventDefault();
+
+    let ul = document.getElementById('ulul');
+    let li = document.createElement('li');
+
+    let ob = {
+        amount: document.getElementById('amount').value,
+        description: document.getElementById('description').value,
+        category: document.getElementById('category').value
+    };
+
+    localStorage.setItem(ob.category, JSON.stringify(ob));
+
+    let nNode = document.createTextNode(`${ob.amount} - ${ob.description} - ${ob.category}`);
+    let delBut = document.createElement('button');
+    let editBut = document.createElement('button');
+    let c = ob.category;
+    delBut.classList.add('Delete');
+    editBut.classList.add('Edit');
+    delBut.innerText = 'Delete';
+    editBut.innerText = 'Edit';
+
+    delBut.onclick = function (e) {
+        delEntry(e, ob.category, li);
+    };
+
+    editBut.onclick = function (e) {
+        editEntry(e, c, li);
+    };
+
+    li.appendChild(nNode);
+    li.appendChild(delBut);
+    li.appendChild(editBut);
+    ul.appendChild(li);
+
+    axios.post('https://crudcrud.com/api/9da778e6354f4f1cb4a2bcd8e3d2b507/a',ob)
+    .then(res=> console.log(res))
+    .catch (e=>console.log(e))
+}
+
+function delEntry(e, c, li) {
+    if (e.target.classList.contains('Delete')) {
+        localStorage.removeItem(c);
+        li.remove();
+    }
+}
+
+function editEntry(e, c, li) {
+    if (e.target.classList.contains('Edit')) {
+        localStorage.removeItem(c);
+        let form = document.getElementById('form');
+        let values = li.childNodes[0].textContent.split('-');
+        form.amount.value = values[0]
+        form.description.value = values[1]
+        form.category.value = values[2]
+
+        li.remove();
+    }
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function(){
+    for (let i = 0; i < localStorage.length; i++) {
+        let elem = localStorage.key(i);
+        let ob= JSON.parse(localStorage.getItem(elem))
+        let ul = document.getElementById('ulul');
+        let li = document.createElement('li');
+        let nNode = document.createTextNode(`${ob.amount} - ${ob.description} - ${ob.category}`);
+    let delBut = document.createElement('button');
+    let editBut = document.createElement('button');
+    let c = ob.category;
+    delBut.classList.add('Delete');
+    editBut.classList.add('Edit');
+    delBut.innerText = 'Delete';
+    editBut.innerText = 'Edit';
+
+    delBut.onclick = function (e) {
+        delEntry(e, c, li);
+    };
+
+    editBut.onclick = function (e) {
+        editEntry(e, c, li);
+    };
+
+    li.appendChild(nNode);
+    li.appendChild(delBut);
+    li.appendChild(editBut);
+    ul.appendChild(li);
+
+    axios('https://crudcrud.com/api/d110136317a24b9084577df55336aae8/to')
+    .then(res=>{
+        console.log(res);
+        for (let i = 0; i < res.data.length; i++) {
+            q(res.data[i])         
+        }
+    })
+    .catch (e=>console.log(e))
+
+    }
+    
+})
+
+
+
+
+  </script>
+   
+</body>
+</html>
