@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <title>Inventory</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <form action="#" id="form" onsubmit="appendobToList(ob)">
+                    Selling Price <input type="text" id="selling">
+                    Product Name <input type="text" id="pname">
+                    
+                    <button id="btn" type="submit">Add Product</button>
+
+                </form>
+                <ul id="ulul" style="list-style-type: none; text-align: center;"></ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+ document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('form');
+  const selling = document.getElementById('selling');
+  const pname = document.getElementById('pname');
+  const ul = document.getElementById('ulul');
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const ob = {
+      selling: document.getElementById('selling').value,
+      pname: document.getElementById('pname').value
+    };
+
+    axios.post('https://crudcrud.com/api/7a08a8159bc047bbb189365973238972/a', ob)
+      .then(res => {
+        appendobToList(res.data);
+        localStorage.setItem(ob.pname, JSON.stringify(res.data));
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+    sellingInput.value = '';
+    pnameInput.value = '';
+  });
+
+  function appendobToList(ob) {
+    const li = document.createElement('li');
+    const delButton = document.createElement('button');
+
+    li.innerHTML = `${ob.selling} - ${ob.pname}`;
+    delButton.classList.add('delete');
+    delButton.innerText = 'Delete';
+    li.appendChild(delButton);
+    ul.appendChild(li);
+
+    delButton.addEventListener('click', function () {
+      deleteob(ob._id, ob.pname);
+      li.remove();
+    });
+  }
+
+  function deleteob(id,pname) {
+    axios.delete(`https://crudcrud.com/api/7a08a8159bc047bbb189365973238972/a/${id}`)
+      .then(res => {
+        localStorage.removeItem(pname);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  }
+
+  // Retrieve stored entries from localStorage
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const ob = JSON.parse(localStorage.getItem(key));
+    appendobToList(ob);
+  }
+});
+    </script>
+</body>
+</html>
